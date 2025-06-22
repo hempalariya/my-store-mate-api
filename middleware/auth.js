@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
+const User = require("../models/user");
 
-const protect = (req, res, next) => {
+const protect = async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -11,12 +12,17 @@ const protect = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // contains user.id
+    
+ 
+    const user = await User.findById(decoded.id).select("-password");
+
+    if (!user) return res.status(401).json({ error: "User not found" });
+
+    req.user = user; 
     next();
-  } catch (error) { 
+  } catch (error) {
     res.status(401).json({ error: "Invalid token" });
   }
 };
 
 module.exports = protect;
- 

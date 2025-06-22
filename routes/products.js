@@ -1,5 +1,5 @@
 const express = require('express');
-const {addProduct, getUserProducts, listForResale, getAllResaleProducts, getAllNearExpiryProducts, listForDiscount, getAllDiscountedProducts, getDiscountedProductList, getAllExpiredProducts, getNearbyResaleProducts, addSoldProducts, saleSummary, getSalewiseStats, getProductWiseStats} = require('../controllers/productController')
+const {addProduct, getUserProducts, listForResale, getAllResaleProducts, getAllNearExpiryProducts, listForDiscount, getAllDiscountedProducts, getDiscountedProductList, getAllExpiredProducts, getNearbyResaleProducts, addSoldProducts, saleSummary, getSalewiseStats, getProductWiseStats, deleteProduct} = require('../controllers/productController')
 const protect = require('../middleware/auth')
 
 const router = express.Router();
@@ -9,6 +9,10 @@ router.post('/', protect, addProduct)
 
 //get all products of logged in user 
 router.get('/', protect, getUserProducts)
+
+//delete product
+
+router.delete('/:id', protect, deleteProduct)
 
 //add resale items
 router.patch("/resale/:productId", protect, listForResale)
@@ -34,6 +38,8 @@ router.get("/discount/list", getDiscountedProductList)
 //get all the products nearby listed for resale
 
 router.get("/resale/nearby", protect, getNearbyResaleProducts)
+
+
 
 
 /***************sold product routes*********************/

@@ -367,6 +367,29 @@ const getProductWiseStats = async (req, res) => {
 };
 
 
+//delete Product
+const deleteProduct = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const product = await Product.findOneAndDelete({
+      _id: id,
+      shopkeeper: req.user.id,
+    });
+
+    if (!product) {
+      return res.status(404).json({ error: "Product not found or unauthorized" });
+    }
+
+    res.status(200).json({ message: "Product deleted successfully", product });
+  } catch (error) {
+    console.error("Delete error:", error.message);
+    res.status(500).json({ error: "Server error while deleting product" });
+  }
+};
+
+
+
 module.exports = {
   addProduct,
   getUserProducts,
@@ -382,4 +405,5 @@ module.exports = {
   saleSummary,
   getSalewiseStats,
   getProductWiseStats,
+  deleteProduct
 };
