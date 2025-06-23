@@ -60,9 +60,9 @@ const addProduct = async (req, res) => {
 
 const getUserProducts = async (req, res) => {
   try {
-    // Populate interestedUsers to display their details to the listing shopkeeper
+    // Only populate shopkeeper, interestedUsers display moved to resale tab
     const products = await Product.find({ shopkeeper: req.user.id })
-      .populate('interestedUsers.user', 'shopName ownerName mobile'); // Populate details of interested users
+      .populate("shopkeeper");
 
     //update each product's isNearExpiry Field if needed
     const updatedProducts = await Promise.all(
@@ -131,7 +131,9 @@ const getAllResaleProducts = async (req, res) => {
     const resaleProducts = await Product.find({
       listedForResale: true,
       shopkeeper: req.user.id,
-    }).populate("shopkeeper");
+    })
+    .populate("shopkeeper")
+    .populate('interestedUsers.user', 'shopName ownerName mobile'); // Populate interested users' contact info
     res.status(200).json(resaleProducts);
   } catch (error) {
     res.status(500).json({ error: error.message });

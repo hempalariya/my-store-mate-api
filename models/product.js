@@ -21,7 +21,7 @@ const productSchema = new mongoose.Schema(
     listedForDiscount: { type: Boolean, default: false },
     discount: { type: Number, default: 0 },
     outOfStock: { type: Boolean, default: false },
-   
+    // NEW FIELD: To store interested shopkeepers and their contact info
     interestedUsers: [
       {
         user: {

@@ -1,5 +1,5 @@
 const express = require('express');
-const {addProduct, getUserProducts, listForResale, getAllResaleProducts, getAllNearExpiryProducts, listForDiscount, getAllDiscountedProducts, getDiscountedProductList, getAllExpiredProducts, getNearbyResaleProducts, addSoldProducts, saleSummary, getSalewiseStats, getProductWiseStats, deleteProduct, handleInterestedClick} = require('../controllers/productController') // Add handleInterestedClick here
+const {addProduct, getUserProducts, listForResale, getAllResaleProducts, getAllNearExpiryProducts, listForDiscount, getAllDiscountedProducts, getDiscountedProductList, getAllExpiredProducts, getNearbyResaleProducts, addSoldProducts, saleSummary, getSalewiseStats, getProductWiseStats, deleteProduct, handleInterestedClick} = require('../controllers/productController')
 const protect = require('../middleware/auth')
 
 const router = express.Router();
@@ -47,14 +47,12 @@ router.post("/resale/:productId/interested", protect, handleInterestedClick)
 router.post('/sold', protect, addSoldProducts)
 
 //get all sold products
-
 router.get('/sale', protect, getSalewiseStats)
 
 //get productwise sale
 router.get('/sale/productwise', protect, getProductWiseStats)
 
 //get saleSummary
-
 router.get('/sale/summary', protect, saleSummary)
 
 
