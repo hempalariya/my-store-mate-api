@@ -1,5 +1,6 @@
 const Product = require("../models/product");
 const SoldProduct = require("../models/SoldProduct");
+const User = require("../models/user"); // Import User model to get interested shopkeeper's details
 
 const getExpiryStatus = (expiryDate) => {
   if (!expiryDate) return false;
@@ -59,7 +60,9 @@ const addProduct = async (req, res) => {
 
 const getUserProducts = async (req, res) => {
   try {
-    const products = await Product.find({ shopkeeper: req.user.id });
+    // Populate interestedUsers to display their details to the listing shopkeeper
+    const products = await Product.find({ shopkeeper: req.user.id })
+      .populate('interestedUsers.user', 'shopName ownerName mobile'); // Populate details of interested users
 
     //update each product's isNearExpiry Field if needed
     const updatedProducts = await Promise.all(
@@ -208,13 +211,65 @@ const getNearbyResaleProducts = async (req, res) => {
   try {
     const products = await Product.find({
       listedForResale: true,
-      shopkeeper: { $ne: req.user.id },
+      shopkeeper: { $ne: req.user.id }, // Exclude products from the logged-in shopkeeper
     }).populate("shopkeeper", "mobile shopName");
     res.status(200).json(products);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
+
+// NEW CONTROLLER FUNCTION: Handle "interested" button click
+const handleInterestedClick = async (req, res) => {
+  const { productId } = req.params;
+  const interestedShopkeeperId = req.user.id; // The ID of the shopkeeper who clicked "interested"
+
+  try {
+    // Fetch interested shopkeeper's details (mobile, shopName, ownerName)
+    const interestedUser = await User.findById(interestedShopkeeperId).select('shopName ownerName mobile');
+
+    if (!interestedUser) {
+      return res.status(404).json({ error: "Interested shopkeeper not found." });
+    }
+
+    const product = await Product.findById(productId);
+
+    if (!product) {
+      return res.status(404).json({ error: "Product not found." });
+    }
+
+    // Prevent shopkeeper from expressing interest in their own product
+    if (product.shopkeeper.toString() === interestedShopkeeperId.toString()) {
+      return res.status(400).json({ error: "You cannot express interest in your own product." });
+    }
+
+    // Check if this shopkeeper has already expressed interest
+    const alreadyInterested = product.interestedUsers.some(
+      (entry) => entry.user.toString() === interestedShopkeeperId.toString()
+    );
+
+    if (alreadyInterested) {
+      return res.status(400).json({ message: "You have already expressed interest in this product." });
+    }
+
+    // Add the interested shopkeeper's details to the product's interestedUsers array
+    product.interestedUsers.push({
+      user: interestedUser._id,
+      shopName: interestedUser.shopName,
+      ownerName: interestedUser.ownerName,
+      mobile: interestedUser.mobile,
+    });
+
+    await product.save();
+
+    res.status(200).json({ message: "Interest recorded successfully." });
+
+  } catch (error) {
+    console.error("Error handling interested click:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
 
 /**********sold itmes **************/
 //add sold items
@@ -405,5 +460,6 @@ module.exports = {
   saleSummary,
   getSalewiseStats,
   getProductWiseStats,
-  deleteProduct
+  deleteProduct,
+  handleInterestedClick, // Export the new function
 };

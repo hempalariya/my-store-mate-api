@@ -1,5 +1,5 @@
 const express = require('express');
-const {addProduct, getUserProducts, listForResale, getAllResaleProducts, getAllNearExpiryProducts, listForDiscount, getAllDiscountedProducts, getDiscountedProductList, getAllExpiredProducts, getNearbyResaleProducts, addSoldProducts, saleSummary, getSalewiseStats, getProductWiseStats, deleteProduct} = require('../controllers/productController')
+const {addProduct, getUserProducts, listForResale, getAllResaleProducts, getAllNearExpiryProducts, listForDiscount, getAllDiscountedProducts, getDiscountedProductList, getAllExpiredProducts, getNearbyResaleProducts, addSoldProducts, saleSummary, getSalewiseStats, getProductWiseStats, deleteProduct, handleInterestedClick} = require('../controllers/productController') // Add handleInterestedClick here
 const protect = require('../middleware/auth')
 
 const router = express.Router();
@@ -7,11 +7,10 @@ const router = express.Router();
 //add new product
 router.post('/', protect, addProduct)
 
-//get all products of logged in user 
+//get all products of logged in user
 router.get('/', protect, getUserProducts)
 
 //delete product
-
 router.delete('/:id', protect, deleteProduct)
 
 //add resale items
@@ -27,7 +26,7 @@ router.get('/near-expiry', protect,  getAllNearExpiryProducts)
 router.patch("/discount/:productId", protect, listForDiscount)
 
 //get all discounted items
-router.get("/discount", protect, getAllDiscountedProducts) 
+router.get("/discount", protect, getAllDiscountedProducts)
 
 //get all expired items
 router.get("/expired", protect, getAllExpiredProducts)
@@ -36,10 +35,10 @@ router.get("/expired", protect, getAllExpiredProducts)
 router.get("/discount/list", getDiscountedProductList)
 
 //get all the products nearby listed for resale
-
 router.get("/resale/nearby", protect, getNearbyResaleProducts)
 
-
+// NEW ROUTE: Handle "interested" button click
+router.post("/resale/:productId/interested", protect, handleInterestedClick)
 
 
 /***************sold product routes*********************/
@@ -60,5 +59,3 @@ router.get('/sale/summary', protect, saleSummary)
 
 
 module.exports = router
-
-  

@@ -21,6 +21,22 @@ const productSchema = new mongoose.Schema(
     listedForDiscount: { type: Boolean, default: false },
     discount: { type: Number, default: 0 },
     outOfStock: { type: Boolean, default: false },
+   
+    interestedUsers: [
+      {
+        user: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
+        shopName: String,
+        ownerName: String,
+        mobile: String,
+        timestamp: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
   },
   { timestamps: true }
 );
